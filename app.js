@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
+const helmet = require("helmet");
 const socketConnection = require("./socket");
 const setSockets = require("./helpers/socketHandlers");
 const chartRoutes = require("./routes/charts");
 const port = 8080;
 
+app.use(helmet());
 app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
