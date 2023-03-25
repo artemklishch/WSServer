@@ -6,6 +6,11 @@ const setSockets = require("./helpers/socketHandlers");
 const chartRoutes = require("./routes/charts");
 const port = 8080;
 
+const hostName =
+  process.env.NODE_ENV === "development"
+    ? `http://localhost:${port}`
+    : `https://wsserver-aaqy.onrender.com:${port}`;
+
 app.use(helmet());
 app.use(express.json());
 app.use((req, res, next) => {
@@ -25,7 +30,7 @@ const server = app.listen(port, () => {
 
 const io = socketConnection.init(server, {
   cors: {
-    origin: `http://localhost:${port}`,
+    origin: hostName,
     methods: ["GET", "POST", "DELETE", "PUT"],
   },
 });
