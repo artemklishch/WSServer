@@ -2,8 +2,9 @@ const express = require("express");
 const app = express();
 const helmet = require("helmet");
 const socketConnection = require("./socket");
-const setSockets = require("./helpers/socketHandlers");
+const { setSockets } = require("./helpers/socketHandlers");
 const chartRoutes = require("./routes/charts");
+const { sqLiteConnect } = require("./util/database");
 const port = 8080;
 
 const hostName =
@@ -24,14 +25,16 @@ app.use((req, res, next) => {
 });
 app.use(chartRoutes);
 
-const server = app.listen(port, () => {
-  console.log(`The app is listening on port ${port}`);
-});
+sqLiteConnect(() => {
+  const server = app.listen(port, () => {
+    console.log(`The app is listening on port ${port}`);
+  });
 
-const io = socketConnection.init(server, {
-  cors: {
-    origin: hostName,
-    methods: ["GET", "POST", "DELETE", "PUT"],
-  },
+  const io = socketConnection.init(server, {
+    cors: {
+      origin: hostName,
+      methods: ["GET", "POST", "DELETE", "PUT"],
+    },
+  });
+  io.on("connection", setSockets);
 });
-io.on("connection", setSockets);
